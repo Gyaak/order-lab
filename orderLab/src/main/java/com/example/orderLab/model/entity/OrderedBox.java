@@ -1,5 +1,6 @@
 package com.example.orderLab.model.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.orderLab.model.OrderListConverter;
@@ -32,13 +33,15 @@ public class OrderedBox {
 	@Column
 	private String name;
 
-	@Column
+	@Column(columnDefinition = "longblob")
 	@Setter
 	@Convert(converter = OrderListConverter.class)
 	private List<Long> itemOrderList; // box에 속한 item들의 순서를 List로 제어
 
 	public void moveItem(Long targetId, int destination) {
-		itemOrderList.remove(targetId);
-		itemOrderList.add(destination, targetId);
+		List<Long> list = new ArrayList<>(itemOrderList);
+		list.remove(targetId);
+		list.add(destination, targetId);
+		this.itemOrderList = list;
 	}
 }
