@@ -1,0 +1,22 @@
+networks:
+  order-lab-network:
+    driver: bridge
+
+services:
+  orderLab-mysql:
+    image: mysql:8.0
+    container_name: order-lab-mysql
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DOCKER_MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${DOCKER_MYSQL_DATABASE}
+      - TZ=Asia/Seoul
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --lower_case_table_names=1
+    networks:
+      - order-lab-network
