@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.orderLab.model.entity.OrderedBox;
 import com.example.orderLab.model.entity.OrderedItem;
 import com.example.orderLab.model.entity.UnorderedBox;
 
@@ -17,6 +18,8 @@ public interface OrderedItemRepository extends JpaRepository<OrderedItem, Long> 
 	List<OrderedItem> findAllByBoxOrderByItemOrder(UnorderedBox box);
 	List<OrderedItem> findAllByBoxIdOrderByItemOrder(Long boxId);
 	List<OrderedItem> findAllByBoxId(Long boxId);
+
+	void deleteByBox(UnorderedBox box);
 
 	@Modifying
 	@Query(value = "UPDATE OrderedItem item SET item.itemOrder = item.itemOrder + :diff WHERE item.box.id = :boxId AND item.itemOrder BETWEEN :fromOrder AND :toOrder")

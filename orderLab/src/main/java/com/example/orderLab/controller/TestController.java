@@ -1,18 +1,13 @@
 package com.example.orderLab.controller;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.orderLab.model.entity.OrderedItem;
 import com.example.orderLab.model.repository.OrderedBoxRepository;
 import com.example.orderLab.service.OrderedBoxService;
 import com.example.orderLab.service.UnorderedBoxService;
 
-import jakarta.annotation.PostConstruct;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TestController {
 
-	private final int itrNum = 300;
-	private final int num = 100;
+	private final int itrNum = 100;
+	private final int num = 1000;
 	private final long MOD = 1_000_000;
 
 	private final OrderedBoxRepository orderedBoxRepository;
@@ -51,21 +46,21 @@ public class TestController {
 			int to = (int)(Math.random() * num) % num;
 
 			a += orderedBoxService.testMoveOrder(orderedBox, from, to);
-			b += unorderedBoxService.testMoveWithOneQuery(unorderedBox1, from, to);
-			c += unorderedBoxService.testMoveWithNaiveQuery(unorderedBox2, from, to);
-			g += unorderedBoxService.testMoveWithInterval(intervalBox, from, to);
+			b += unorderedBoxService.testMoveWithDeleteAndInsert(unorderedBox1, from, to);
+			c += unorderedBoxService.testMoveWithOneQuery(unorderedBox2, from, to);
+			d += unorderedBoxService.testMoveWithInterval(intervalBox, from, to);
 			// System.out.println(unorderedBoxService.getAllItemInBox(intervalBox).stream().map(OrderedItem::getId).toList());
 		}
 
 		for(int i = 0; i<itrNum; i++) {
-			d += orderedBoxService.testGetAllItemInBox(orderedBox);
-			e += unorderedBoxService.testGetAllItemInBox(unorderedBox1);
+			e += orderedBoxService.testGetAllItemInBox(orderedBox);
+			f += unorderedBoxService.testGetAllItemInBox(unorderedBox1);
 			// f += unorderedBoxService.testGetAllItemInBox(unorderedBox2);
 			// h += unorderedBoxService.testGetAllItemInBox(intervalBox);
 		}
 
 
-		return String.format("%d %d %d %d %d %d %d %d", a/MOD, b/MOD, c/MOD, g/MOD, d/MOD, e/MOD, f/MOD, h/MOD);
+		return String.format("%d %d %d %d %d %d", a/MOD, b/MOD, c/MOD, d/MOD, e/MOD, f/MOD);
 	}
 
 

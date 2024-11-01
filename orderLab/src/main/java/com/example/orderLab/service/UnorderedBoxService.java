@@ -1,18 +1,13 @@
 package com.example.orderLab.service;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.orderLab.model.entity.OrderedBox;
 import com.example.orderLab.model.entity.OrderedItem;
 import com.example.orderLab.model.entity.UnorderedBox;
-import com.example.orderLab.model.entity.UnorderedItem;
 import com.example.orderLab.model.repository.OrderedItemRepository;
 import com.example.orderLab.model.repository.UnorderedBoxRepository;
 
@@ -39,11 +34,11 @@ public class UnorderedBoxService {
 	}
 
 	@Transactional
-	public long testMoveWithNaiveQuery(UnorderedBox box, int from, int to) {
+	public long testMoveWithDeleteAndInsert(UnorderedBox box, int from, int to) {
 		var itemList = getAllItemInBox(box);
 		entityManager.clear();
 		long startTime = System.nanoTime();
-		moveItemWithNaiveQuery(itemList.get(from).getId(), from, to);
+		itemRepository.saveAll(moveItemWithDeleteAndInsert(box, from, to));
 		long endTime = System.nanoTime();
 		// log.info("testMoveWithNaiveQuery 이동 시간 : {} ms", endTime - startTime);
 		return endTime - startTime;
@@ -111,8 +106,24 @@ public class UnorderedBoxService {
 	}
 
 	@Transactional
+	public List<OrderedItem> moveItemWithDeleteAndInsert(UnorderedBox box, int from, int to) {
+		var itemList = getAllItemInBox(box);
+		itemRepository.deleteByBox(box);
+		// entityManager.flush();
+		List<OrderedItem> newList = new ArrayList<>();
+		for (int i = 0; i<itemList.size(); i++) {
+			newList.add(OrderedItem.builder().itemOrder(i).content(itemList.get(i).getContent()).box(box).build());
+		}
+		var tmpItem = newList.get(from);
+		newList.remove(tmpItem);
+		newList.add(to, tmpItem);
+		return newList;
+		// itemRepository.saveAll(itemList);
+	}
+
+	@Transactional
 	public void moveItemWithIntervalOrder(UnorderedBox box, Long targetId, int from, int to) {
-		entityManager.clear();
+		// entityManager.clear();
 		if(from == to) {
 			return;
 		}

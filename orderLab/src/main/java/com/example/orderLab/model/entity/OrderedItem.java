@@ -21,6 +21,7 @@ import lombok.Setter;
 public class OrderedItem {
 
 	@Id
+	@Setter
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
